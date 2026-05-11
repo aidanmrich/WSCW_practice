@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspañolPlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --surface: #18181b;
+    --surface2: #222228;
+    --border: #2e2e38;
+    --accent: #f5c842;
+    --accent2: #e05c3a;
+    --accent3: #4fc3a1;
+    --text: #f0ede8;
+    --muted: #888;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; padding: 32px 24px; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  /* HEADER */
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(245,200,66,0.3);
+    margin-bottom: 6px;
+  }
+  .tagline { color: var(--muted); font-size: 0.95rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #111; }
+  .btn-primary:hover { background: #ffd84d; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,200,66,0.3); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: var(--accent2); color: #fff; }
+  .btn-danger:hover { background: #f06a44; }
+  .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* TOGGLE CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.selected { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
+  .chip.green.selected { background: var(--accent3); border-color: var(--accent3); color: #111; }
+
+  /* BIG MODE BUTTONS */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 520px; margin-bottom: 20px; }
+  .mode-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .mode-card:hover { border-color: var(--accent); background: var(--surface2); }
+  .mode-card.selected { border-color: var(--accent); background: rgba(245,200,66,0.07); }
+  .mode-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .mode-card .mode-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+  .mode-card .mode-desc { color: var(--muted); font-size: 0.82rem; margin-top: 6px; }
+
+  /* GAME TYPE BUTTONS */
+  .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 520px; }
+  .game-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 20px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .game-btn:hover { border-color: var(--accent3); transform: translateY(-2px); }
+  .game-btn .icon { font-size: 3rem; margin-bottom: 14px; }
+  .game-btn .name { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 4px;
+  }
+
+  /* WORD SEARCH GRID */
+  #ws-screen { padding: 20px 16px; }
+  #ws-screen.active { align-items: stretch; }
+
+  .ws-layout { display: flex; gap: 24px; max-width: 900px; margin: 0 auto; width: 100%; flex-wrap: wrap; }
+  .ws-grid-wrap { flex: 1; min-width: 280px; }
+  .ws-sidebar { width: 220px; flex-shrink: 0; }
+
+  #ws-grid {
+    display: inline-grid;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    user-select: none;
+    width: 100%;
+  }
+
+  .ws-cell {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid transparent;
+  }
+  .ws-cell:hover { background: #2e2e38; }
+  .ws-cell.selecting { background: rgba(245,200,66,0.35); }
+  .ws-cell.found { background: rgba(79,195,161,0.28); color: var(--accent3); border-color: var(--accent3); }
+
+  .word-list { list-style: none; }
+  .word-list li {
+    padding: 7px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .word-list li .clue { color: var(--muted); font-size: 0.78rem; display: block; margin-top: 2px; }
+  .word-list li.found-word { text-decoration: line-through; color: var(--accent3); border-color: var(--accent3); opacity: 0.6; }
+
+  /* CROSSWORD */
+  #cw-screen { padding: 20px 16px; }
+  #cw-screen.active { align-items: stretch; }
+
+  .cw-layout { display: flex; gap: 24px; max-width: 960px; margin: 0 auto; width: 100%; flex-wrap: wrap; }
+  .cw-grid-wrap { flex: 1; min-width: 280px; overflow-x: auto; }
+  .cw-sidebar { width: 240px; flex-shrink: 0; }
+
+  #cw-grid {
+    display: inline-grid;
+    gap: 2px;
+    background: #000;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 4px;
+    user-select: none;
+  }
+
+  .cw-cell {
+    width: 38px; height: 38px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .cw-cell.black { background: #111; cursor: default; }
+  .cw-cell.active { background: rgba(245,200,66,0.2); }
+  .cw-cell.active-word { background: rgba(245,200,66,0.08); }
+  .cw-cell.correct { background: rgba(79,195,161,0.2); }
+
+  .cw-cell input {
+    width: 100%; height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    caret-color: transparent;
+  }
+  .cw-cell .cell-num {
+    position: absolute;
+    top: 2px; left: 3px;
+    font-size: 0.55rem;
+    color: var(--muted);
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .clue-section { margin-bottom: 20px; }
+  .clue-section h4 { font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .clue-item {
+    display: flex; gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .clue-item:hover { background: var(--surface); }
+  .clue-item.active-clue { background: var(--surface); border-color: var(--accent); }
+  .clue-item.solved-clue { color: var(--accent3); opacity: 0.6; }
+  .clue-num { color: var(--accent); font-weight: 700; min-width: 20px; }
+
+  /* GAME HEADER */
+  .game-header {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 900px; margin: 0 auto 20px; width: 100%;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .game-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
+  .progress-info { color: var(--muted); font-size: 0.9rem; }
+
+  /* WIN MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 36px;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    animation: popIn 0.3s ease;
+  }
+  @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal .big-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .modal h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
+  .modal p { color: var(--muted); margin-bottom: 28px; }
+
+  /* MISC */
+  .back-btn {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--text); }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; width: 100%; max-width: 520px; }
+
+  .alert {
+    background: rgba(224,92,58,0.15);
+    border: 1px solid rgba(224,92,58,0.4);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    color: #f5a080;
+    margin-bottom: 16px;
+    width: 100%; max-width: 520px;
+  }
+
+  @media (max-width: 600px) {
+    .logo { font-size: 2rem; }
+    .mode-grid, .game-grid { grid-template-columns: 1fr; }
+    .ws-layout, .cw-layout { flex-direction: column; }
+    .ws-sidebar, .cw-sidebar { width: 100%; }
+    .ws-cell { width: 30px; height: 30px; font-size: 0.85rem; }
+    .cw-cell { width: 32px; height: 32px; }
+  }
+
+  .stars { color: var(--accent); font-size: 1.5rem; letter-spacing: 4px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ============ MAIN MENU ============ -->
+<div id="menu-screen" class="screen active">
+  <div class="logo">EspañolPlay</div>
+  <div class="tagline">Practice Spanish your way</div>
+
+  <p class="section-label">What do you want to practice?</p>
+  <div class="mode-grid">
+    <div class="mode-card" id="mode-vocab" onclick="toggleMode('vocab')">
+      <div class="icon">📚</div>
+      <div class="mode-name">Vocabulary</div>
+      <div class="mode-desc">Spanish words &amp; meanings</div>
+    </div>
+    <div class="mode-card" id="mode-verbs" onclick="toggleMode('verbs')">
+      <div class="icon">🔤</div>
+      <div class="mode-name">Verb Conjugation</div>
+      <div class="mode-desc">Conjugate verbs in any tense</div>
+    </div>
+  </div>
+
+  <!-- VOCAB OPTIONS -->
+  <div id="vocab-options" class="card" style="display:none">
+    <div class="card-title">📚 Vocabulary Lists</div>
+    <p class="section-label">Choose one or more lists</p>
+    <div class="chips" id="vocab-chips"></div>
+  </div>
+
+  <!-- VERB OPTIONS -->
+  <div id="verb-options" class="card" style="display:none">
+    <div class="card-title">🔤 Verb Options</div>
+    <p class="section-label">Verb Type</p>
+    <div class="chips" id="verb-type-chips"></div>
+    <p class="section-label" style="margin-top:16px">Pronoun</p>
+    <div class="chips" id="pronoun-chips"></div>
+    <p class="section-label" style="margin-top:16px">Tense / Mood</p>
+    <div class="chips" id="tense-chips"></div>
+  </div>
+
+  <div id="menu-alert" class="alert" style="display:none">Please make at least one selection above.</div>
+
+  <button class="btn btn-primary" onclick="goToGameSelect()" style="width:100%;max-width:520px;padding:16px;font-size:1rem;">
+    Continue →
+  </button>
+</div>
+
+<!-- ============ GAME SELECT ============ -->
+<div id="game-select-screen" class="screen">
+  <button class="back-btn" onclick="showScreen('menu-screen')" style="margin-bottom:24px;align-self:flex-start">← Back</button>
+  <div class="logo" style="font-size:2rem;margin-bottom:4px">Choose Your Game</div>
+  <div class="tagline" style="margin-bottom:40px">How do you want to practice?</div>
+  <div class="game-grid">
+    <div class="game-btn" onclick="startGame('wordsearch')">
+      <div class="icon">🔍</div>
+      <div class="name">Word Search</div>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:8px">Find hidden Spanish words in the grid</p>
+    </div>
+    <div class="game-btn" onclick="startGame('crossword')">
+      <div class="icon">✏️</div>
+      <div class="name">Crossword</div>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:8px">Fill in the crossword with Spanish answers</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WORD SEARCH ============ -->
+<div id="ws-screen" class="screen">
+  <div class="game-header">
+    <div>
+      <button class="back-btn" onclick="showScreen('game-select-screen')">← Back</button>
+      <div class="game-title">Word Search</div>
+    </div>
+    <div class="progress-info">Found: <span id="ws-found">0</span> / <span id="ws-total">0</span></div>
+  </div>
+  <div class="ws-layout">
+    <div class="ws-grid-wrap">
+      <div id="ws-grid"></div>
+    </div>
+    <div class="ws-sidebar">
+      <p class="section-label">Words to Find</p>
+      <ul class="word-list" id="ws-word-list"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CROSSWORD ============ -->
+<div id="cw-screen" class="screen">
+  <div class="game-header">
+    <div>
+      <button class="back-btn" onclick="showScreen('game-select-screen')">← Back</button>
+      <div class="game-title">Crossword</div>
+    </div>
+    <div class="progress-info">Solved: <span id="cw-solved">0</span> / <span id="cw-total">0</span></div>
+  </div>
+  <div class="cw-layout">
+    <div class="cw-grid-wrap">
+      <div id="cw-grid"></div>
+    </div>
+    <div class="cw-sidebar">
+      <div class="clue-section">
+        <h4>Across</h4>
+        <div id="cw-across"></div>
+      </div>
+      <div class="clue-section">
+        <h4>Down</h4>
+        <div id="cw-down"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WIN MODAL ============ -->
+<div class="modal-overlay" id="win-modal">
+  <div class="modal">
+    <div class="big-emoji">🎉</div>
+    <div class="stars">★★★</div>
+    <h2>¡Excelente!</h2>
+    <p id="win-message">You completed the puzzle!</p>
+    <button class="btn btn-primary" onclick="backToMenu()" style="width:100%;margin-bottom:12px">Back to Menu</button>
+    <button class="btn btn-secondary" onclick="replayGame()" style="width:100%">Play Again</button>
+  </div>
+</div>
+
+<script>
+// =========================================================
+// DATA
+// =========================================================
+
+const VOCAB_LISTS = {
+  "Greetings & Basics": [
+    {es:"hola",en:"hello"},{es:"adios",en:"goodbye"},{es:"gracias",en:"thank you"},
+    {es:"por favor",en:"please"},{es:"si",en:"yes"},{es:"no",en:"no"},
+    {es:"bien",en:"good/well"},{es:"mal",en:"bad"},{es:"agua",en:"water"},
+    {es:"amigo",en:"friend"},{es:"nombre",en:"name"},{es:"casa",en:"house"}
+  ],
+  "Family": [
+    {es:"madre",en:"mother"},{es:"padre",en:"father"},{es:"hermano",en:"brother"},
+    {es:"hermana",en:"sister"},{es:"abuelo",en:"grandfather"},{es:"abuela",en:"grandmother"},
+    {es:"hijo",en:"son"},{es:"hija",en:"daughter"},{es:"tio",en:"uncle"},
+    {es:"tia",en:"aunt"},{es:"primo",en:"cousin"},{es:"esposo",en:"husband"}
+  ],
+  "Food & Drink": [
+    {es:"pan",en:"bread"},{es:"leche",en:"milk"},{es:"carne",en:"meat"},
+    {es:"arroz",en:"rice"},{es:"fruta",en:"fruit"},{es:"verdura",en:"vegetable"},
+    {es:"cafe",en:"coffee"},{es:"jugo",en:"juice"},{es:"sopa",en:"soup"},
+    {es:"queso",en:"cheese"},{es:"huevo",en:"egg"},{es:"pollo",en:"chicken"}
+  ],
+  "Colors": [
+    {es:"rojo",en:"red"},{es:"azul",en:"blue"},{es:"verde",en:"green"},
+    {es:"amarillo",en:"yellow"},{es:"negro",en:"black"},{es:"blanco",en:"white"},
+    {es:"morado",en:"purple"},{es:"naranja",en:"orange"},{es:"rosa",en:"pink"},
+    {es:"gris",en:"gray"},{es:"cafe",en:"brown"},{es:"dorado",en:"golden"}
+  ],
+  "Numbers & Time": [
+    {es:"uno",en:"one"},{es:"dos",en:"two"},{es:"tres",en:"three"},
+    {es:"cuatro",en:"four"},{es:"cinco",en:"five"},{es:"diez",en:"ten"},
+    {es:"hoy",en:"today"},{es:"manana",en:"tomorrow"},{es:"ayer",en:"yesterday"},
+    {es:"hora",en:"hour"},{es:"dia",en:"day"},{es:"semana",en:"week"}
+  ],
+  "Travel": [
+    {es:"hotel",en:"hotel"},{es:"aeropuerto",en:"airport"},{es:"avion",en:"airplane"},
+    {es:"tren",en:"train"},{es:"carro",en:"car"},{es:"mapa",en:"map"},
+    {es:"pasaporte",en:"passport"},{es:"billete",en:"ticket"},{es:"ciudad",en:"city"},
+    {es:"playa",en:"beach"},{es:"museo",en:"museum"},{es:"calle",en:"street"}
+  ]
+};
+
+const VERB_TYPES = {
+  "-AR Verbs": [
+    {inf:"hablar",stem:"habl",type:"ar"},{inf:"caminar",stem:"camin",type:"ar"},
+    {inf:"trabajar",stem:"trabaj",type:"ar"},{inf:"comprar",stem:"compr",type:"ar"},
+    {inf:"escuchar",stem:"escuch",type:"ar"},{inf:"tomar",stem:"tom",type:"ar"},
+    {inf:"mirar",stem:"mir",type:"ar"},{inf:"bailar",stem:"bail",type:"ar"},
+    {inf:"cantar",stem:"cant",type:"ar"},{inf:"llegar",stem:"lleg",type:"ar"},
+    {inf:"viajar",stem:"viaj",type:"ar"},{inf:"preparar",stem:"prepar",type:"ar"}
+  ],
+  "-ER Verbs": [
+    {inf:"comer",stem:"com",type:"er"},{inf:"beber",stem:"beb",type:"er"},
+    {inf:"correr",stem:"corr",type:"er"},{inf:"aprender",stem:"aprend",type:"er"},
+    {inf:"leer",stem:"le",type:"er"},{inf:"vender",stem:"vend",type:"er"},
+    {inf:"comprender",stem:"comprend",type:"er"},{inf:"romper",stem:"romp",type:"er"},
+    {inf:"creer",stem:"cre",type:"er"},{inf:"deber",stem:"deb",type:"er"}
+  ],
+  "-IR Verbs": [
+    {inf:"vivir",stem:"viv",type:"ir"},{inf:"escribir",stem:"escrib",type:"ir"},
+    {inf:"abrir",stem:"abr",type:"ir"},{inf:"recibir",stem:"recib",type:"ir"},
+    {inf:"subir",stem:"sub",type:"ir"},{inf:"partir",stem:"part",type:"ir"},
+    {inf:"decidir",stem:"decid",type:"ir"},{inf:"permitir",stem:"permit",type:"ir"},
+    {inf:"cubrir",stem:"cubr",type:"ir"},{inf:"existir",stem:"exist",type:"ir"}
+  ],
+  "Irregulars": [
+    {inf:"ser",type:"irr"},{inf:"estar",type:"irr"},{inf:"ir",type:"irr"},
+    {inf:"tener",type:"irr"},{inf:"hacer",type:"irr"},{inf:"poder",type:"irr"},
+    {inf:"querer",type:"irr"},{inf:"saber",type:"irr"},{inf:"venir",type:"irr"},
+    {inf:"decir",type:"irr"},{inf:"poner",type:"irr"},{inf:"dar",type:"irr"}
+  ],
+  "Stem-Changers": [
+    {inf:"dormir",stem:"duerm",type:"sc_ue"},{inf:"poder",stem:"pued",type:"sc_ue"},
+    {inf:"volver",stem:"vuelv",type:"sc_ue"},{inf:"jugar",stem:"jueg",type:"sc_ue"},
+    {inf:"encontrar",stem:"encuentr",type:"sc_ue"},{inf:"pedir",stem:"pid",type:"sc_e"},
+    {inf:"servir",stem:"sirv",type:"sc_e"},{inf:"repetir",stem:"repit",type:"sc_e"},
+    {inf:"pensar",stem:"piens",type:"sc_ie"},{inf:"querer",stem:"quier",type:"sc_ie"},
+    {inf:"entender",stem:"entiend",type:"sc_ie"},{inf:"preferir",stem:"prefier",type:"sc_ie"}
+  ]
+};
+
+const PRONOUNS = ["yo","tu","el/ella","nosotros","vosotros","ellos/ellas"];
+const TENSES = ["Present","Preterite","Imperfect","Future","Conditional","Subjunctive (Pres)"];
+
+// Conjugation table: [yo, tu, el, nosotros, vosotros, ellos]
+const CONJ = {
+  // Regular AR present
+  ar_present: ["o","as","a","amos","ais","an"],
+  er_present: ["o","es","e","emos","eis","en"],
+  ir_present: ["o","es","e","imos","is","en"],
+  // Preterite
+  ar_preterite: ["e","aste","o","amos","asteis","aron"],
+  er_preterite: ["i","iste","io","imos","isteis","ieron"],
+  ir_preterite: ["i","iste","io","imos","isteis","ieron"],
+  // Imperfect
+  ar_imperfect: ["aba","abas","aba","abamos","abais","aban"],
+  er_imperfect: ["ia","ias","ia","iamos","iais","ian"],
+  ir_imperfect: ["ia","ias","ia","iamos","iais","ian"],
+  // Future (regular: infinitive + endings)
+  future: ["e","as","a","emos","eis","an"],
+  // Conditional
+  conditional: ["ia","ias","ia","iamos","iais","ian"],
+  // Present subjunctive
+  ar_subjunctive: ["e","es","e","emos","eis","en"],
+  er_subjunctive: ["a","as","a","amos","ais","an"],
+  ir_subjunctive: ["a","as","a","amos","ais","an"],
+};
+
+// Irregular verb conjugations (just a sample set)
+const IRR_CONJ = {
+  ser: {
+    present: ["soy","eres","es","somos","sois","son"],
+    preterite: ["fui","fuiste","fue","fuimos","fuisteis","fueron"],
+    imperfect: ["era","eras","era","eramos","erais","eran"],
+    future: ["sere","seras","sera","seremos","sereis","seran"],
+    conditional: ["seria","serias","seria","seriamos","seriais","serian"],
+    subjunctive: ["sea","seas","sea","seamos","seais","sean"],
+  },
+  estar: {
+    present: ["estoy","estas","esta","estamos","estais","estan"],
+    preterite: ["estuve","estuviste","estuvo","estuvimos","estuvisteis","estuvieron"],
+    imperfect: ["estaba","estabas","estaba","estabamos","estabais","estaban"],
+    future: ["estare","estaras","estara","estaremos","estareis","estaran"],
+    conditional: ["estaria","estarias","estaria","estariamos","estariais","estarian"],
+    subjunctive: ["este","estes","este","estemos","esteis","esten"],
+  },
+  ir: {
+    present: ["voy","vas","va","vamos","vais","van"],
+    preterite: ["fui","fuiste","fue","fuimos","fuisteis","fueron"],
+    imperfect: ["iba","ibas","iba","ibamos","ibais","iban"],
+    future: ["ire","iras","ira","iremos","ireis","iran"],
+    conditional: ["iria","irias","iria","iriamos","iriais","irian"],
+    subjunctive: ["vaya","vayas","vaya","vayamos","vayais","vayan"],
+  },
+  tener: {
+    present: ["tengo","tienes","tiene","tenemos","teneis","tienen"],
+    preterite: ["tuve","tuviste","tuvo","tuvimos","tuvisteis","tuvieron"],
+    imperfect: ["tenia","tenias","tenia","teniamos","teniais","tenian"],
+    future: ["tendre","tendras","tendra","tendremos","tendreis","tendran"],
+    conditional: ["tendria","tendrias","tendria","tendriamos","tendriais","tendrian"],
+    subjunctive: ["tenga","tengas","tenga","tengamos","tengais","tengan"],
+  },
+  hacer: {
+    present: ["hago","haces","hace","hacemos","haceis","hacen"],
+    preterite: ["hice","hiciste","hizo","hicimos","hicisteis","hicieron"],
+    imperfect: ["hacia","hacias","hacia","haciamos","haciais","hacian"],
+    future: ["hare","haras","hara","haremos","hareis","haran"],
+    conditional: ["haria","harias","haria","hariamos","hariais","harian"],
+    subjunctive: ["haga","hagas","haga","hagamos","hagais","hagan"],
+  },
+  poder: {
+    present: ["puedo","puedes","puede","podemos","podeis","pueden"],
+    preterite: ["pude","pudiste","pudo","pudimos","pudisteis","pudieron"],
+    imperfect: ["podia","podias","podia","podiamos","podiais","podian"],
+    future: ["podre","podras","podra","podremos","podreis","podran"],
+    conditional: ["podria","podrias","podria","podriamos","podriais","podrian"],
+    subjunctive: ["pueda","puedas","pueda","podamos","podais","puedan"],
+  },
+  querer: {
+    present: ["quiero","quieres","quiere","queremos","quereis","quieren"],
+    preterite: ["quise","quisiste","quiso","quisimos","quisisteis","quisieron"],
+    imperfect: ["queria","querias","queria","queriamos","queriais","querian"],
+    future: ["querre","querras","querra","querremos","querreis","querran"],
+    conditional: ["querria","querrias","querria","querriamos","querriais","querrian"],
+    subjunctive: ["quiera","quieras","quiera","queramos","querais","quieran"],
+  },
+  saber: {
+    present: ["se","sabes","sabe","sabemos","sabeis","saben"],
+    preterite: ["supe","supiste","supo","supimos","supisteis","supieron"],
+    imperfect: ["sabia","sabias","sabia","sabiamos","sabiais","sabian"],
+    future: ["sabre","sabras","sabra","sabremos","sabreis","sabran"],
+    conditional: ["sabria","sabrias","sabria","sabriamos","sabriais","sabrian"],
+    subjunctive: ["sepa","sepas","sepa","sepamos","sepais","sepan"],
+  },
+  venir: {
+    present: ["vengo","vienes","viene","venimos","venís","vienen"],
+    preterite: ["vine","viniste","vino","vinimos","vinisteis","vinieron"],
+    imperfect: ["venia","venias","venia","veniamos","veniais","venian"],
+    future: ["vendre","vendras","vendra","vendremos","vendreis","vendran"],
+    conditional: ["vendria","vendrias","vendria","vendriamos","vendriais","vendrian"],
+    subjunctive: ["venga","vengas","venga","vengamos","vengais","vengan"],
+  },
+  decir: {
+    present: ["digo","dices","dice","decimos","decis","dicen"],
+    preterite: ["dije","dijiste","dijo","dijimos","dijisteis","dijeron"],
+    imperfect: ["decia","decias","decia","deciamos","deciais","decian"],
+    future: ["dire","diras","dira","diremos","direis","diran"],
+    conditional: ["diria","dirias","diria","diriamos","diriais","dirian"],
+    subjunctive: ["diga","digas","diga","digamos","digais","digan"],
+  },
+  poner: {
+    present: ["pongo","pones","pone","ponemos","poneis","ponen"],
+    preterite: ["puse","pusiste","puso","pusimos","pusisteis","pusieron"],
+    imperfect: ["ponia","ponias","ponia","poniamos","poniais","ponian"],
+    future: ["pondre","pondras","pondra","pondremos","pondreis","pondran"],
+    conditional: ["pondria","pondrias","pondria","pondriamos","pondriais","pondrian"],
+    subjunctive: ["ponga","pongas","ponga","pongamos","pongais","pongan"],
+  },
+  dar: {
+    present: ["doy","das","da","damos","dais","dan"],
+    preterite: ["di","diste","dio","dimos","disteis","dieron"],
+    imperfect: ["daba","dabas","daba","dabamos","dabais","daban"],
+    future: ["dare","daras","dara","daremos","dareis","daran"],
+    conditional: ["daria","darias","daria","dariamos","dariais","darian"],
+    subjunctive: ["de","des","de","demos","deis","den"],
+  }
+};
+
+function conjugate(verbObj, pronIdx, tense) {
+  const t = tense.toLowerCase().replace(/\s+/g,'_').replace('(pres)','').replace('subjunctive_','subjunctive');
+  const inf = verbObj.inf;
+  const type = verbObj.type;
+
+  // Irregular
+  if (type === "irr" && IRR_CONJ[inf]) {
+    const key = t === "subjunctive_" ? "subjunctive" : t.replace('present_','present').replace('preterite_','preterite').replace('imperfect_','imperfect').replace('future_','future').replace('conditional_','conditional').replace('pres','present');
+    const cleanKey = t.replace('subjunctive','subjunctive').trim();
+    const map = {"present":"present","preterite":"preterite","imperfect":"imperfect","future":"future","conditional":"conditional","subjunctive_(pres)":"subjunctive","subjunctive_pres":"subjunctive","subjunctive":"subjunctive"};
+    const k = map[t] || map[cleanKey] || "present";
+    return IRR_CONJ[inf][k]?.[pronIdx] || "—";
+  }
+
+  // Stem-changers: treat as regular for non-present tenses mostly
+  const stemType = type.startsWith("sc_") ? type.split("_")[1] : null;
+  const verbType = (type === "ar"||type === "er"||type === "ir") ? type : verbObj.inf.slice(-2);
+
+  const stem = verbObj.stem || inf.slice(0, -2);
+  const endings = {
+    "present": {ar:CONJ.ar_present, er:CONJ.er_present, ir:CONJ.ir_present},
+    "preterite": {ar:CONJ.ar_preterite, er:CONJ.er_preterite, ir:CONJ.ir_preterite},
+    "imperfect": {ar:CONJ.ar_imperfect, er:CONJ.er_imperfect, ir:CONJ.ir_imperfect},
+    "future": null,
+    "conditional": null,
+    "subjunctive_(pres)": {ar:CONJ.ar_subjunctive, er:CONJ.er_subjunctive, ir:CONJ.ir_subjunctive},
+    "subjunctive": {ar:CONJ.ar_subjunctive, er:CONJ.er_subjunctive, ir:CONJ.ir_subjunctive},
+  };
+
+  const tKey = t.includes("subjunctive") ? "subjunctive_(pres)" : t;
+  if (tKey === "future") return inf + CONJ.future[pronIdx];
+  if (tKey === "conditional") return inf + CONJ.conditional[pronIdx];
+
+  const vt = (type==="ar"||type==="er"||type==="ir") ? type : inf.slice(-2);
+  const endingSet = endings[tKey];
+  if (!endingSet || !endingSet[vt]) return inf + "—";
+
+  // Stem-changing in present (yo/tu/el/ellos)
+  if (stemType && tKey === "present") {
+    const changeable = [0,1,2,5];
+    if (changeable.includes(pronIdx)) {
+      return (verbObj.stem || stem) + endingSet[vt][pronIdx];
+    } else {
+      const regStem = inf.slice(0,-2);
+      return regStem + endingSet[vt][pronIdx];
+    }
+  }
+
+  return stem + endingSet[vt][pronIdx];
+}
+
+// =========================================================
+// UI STATE
+// =========================================================
+let selectedMode = null; // 'vocab','verbs','both'
+let selectedVocabLists = [];
+let selectedVerbTypes = [];
+let selectedPronouns = [];
+let selectedTenses = [];
+let currentGameType = null;
+let currentWords = []; // {word, clue}
+
+// =========================================================
+// MENU SETUP
+// =========================================================
+function init() {
+  // Vocab chips
+  const vc = document.getElementById('vocab-chips');
+  Object.keys(VOCAB_LISTS).forEach(k => {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.textContent = k; c.dataset.key = k;
+    c.onclick = () => { c.classList.toggle('selected'); updateVocabSel(); };
+    vc.appendChild(c);
+  });
+
+  // Verb type chips
+  const vtc = document.getElementById('verb-type-chips');
+  Object.keys(VERB_TYPES).forEach(k => {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.textContent = k; c.dataset.key = k;
+    c.onclick = () => { c.classList.toggle('selected'); updateVerbSel(); };
+    vtc.appendChild(c);
+  });
+
+  // Pronoun chips
+  const pc = document.getElementById('pronoun-chips');
+  PRONOUNS.forEach(p => {
+    const c = document.createElement('button');
+    c.className = 'chip green'; c.textContent = p;
+    c.onclick = () => { c.classList.toggle('selected'); updateVerbSel(); };
+    pc.appendChild(c);
+  });
+
+  // Tense chips
+  const tc = document.getElementById('tense-chips');
+  TENSES.forEach(t => {
+    const c = document.createElement('button');
+    c.className = 'chip green'; c.textContent = t;
+    c.onclick = () => { c.classList.toggle('selected'); updateVerbSel(); };
+    tc.appendChild(c);
+  });
+}
+
+function toggleMode(m) {
+  const modeCards = {vocab:'mode-vocab', verbs:'mode-verbs'};
+  if (selectedMode === m) {
+    selectedMode = null;
+    document.getElementById(modeCards[m]).classList.remove('selected');
+  } else {
+    selectedMode = m;
+    Object.values(modeCards).forEach(id => document.getElementById(id).classList.remove('selected'));
+    document.getElementById(modeCards[m]).classList.add('selected');
+  }
+  document.getElementById('vocab-options').style.display = (selectedMode === 'vocab') ? 'block' : 'none';
+  document.getElementById('verb-options').style.display = (selectedMode === 'verbs') ? 'block' : 'none';
+}
+
+function updateVocabSel() {
+  selectedVocabLists = [...document.querySelectorAll('#vocab-chips .chip.selected')].map(c => c.dataset.key);
+}
+function updateVerbSel() {
+  selectedVerbTypes = [...document.querySelectorAll('#verb-type-chips .chip.selected')].map(c => c.dataset.key);
+  selectedPronouns = [...document.querySelectorAll('#pronoun-chips .chip.selected')].map(c => c.textContent);
+  selectedTenses = [...document.querySelectorAll('#tense-chips .chip.selected')].map(c => c.textContent);
+}
+
+function goToGameSelect() {
+  const alert = document.getElementById('menu-alert');
+  if (!selectedMode) { alert.textContent = "Please choose Vocabulary or Verb Conjugation."; alert.style.display='block'; return; }
+  if (selectedMode === 'vocab' && selectedVocabLists.length === 0) { alert.textContent = "Please select at least one vocabulary list."; alert.style.display='block'; return; }
+  if (selectedMode === 'verbs') {
+    if (selectedVerbTypes.length === 0) { alert.textContent = "Please select at least one verb type."; alert.style.display='block'; return; }
+    if (selectedPronouns.length === 0) { alert.textContent = "Please select at least one pronoun."; alert.style.display='block'; return; }
+    if (selectedTenses.length === 0) { alert.textContent = "Please select at least one tense."; alert.style.display='block'; return; }
+  }
+  alert.style.display = 'none';
+  showScreen('game-select-screen');
+}
+
+function buildWordList() {
+  currentWords = [];
+  if (selectedMode === 'vocab') {
+    let pool = [];
+    selectedVocabLists.forEach(l => { pool = pool.concat(VOCAB_LISTS[l]); });
+    pool = shuffle(pool).slice(0, 12);
+    currentWords = pool.map(w => ({ word: clean(w.es), clue: w.en }));
+  } else {
+    let pool = [];
+    selectedVerbTypes.forEach(vt => { pool = pool.concat(VERB_TYPES[vt]); });
+    pool = shuffle(pool);
+    const pronounIdx = PRONOUNS.indexOf(shuffle([...selectedPronouns])[0]);
+    const tense = shuffle([...selectedTenses])[0];
+
+    // Generate unique conjugations
+    const seen = new Set();
+    for (const verb of pool) {
+      if (currentWords.length >= 12) break;
+      const pronIdx = Math.floor(Math.random() * selectedPronouns.length);
+      const pron = selectedPronouns[pronIdx];
+      const pIdx = PRONOUNS.indexOf(pron);
+      const t = selectedTenses[Math.floor(Math.random() * selectedTenses.length)];
+      const conj = conjugate(verb, pIdx, t);
+      const conjClean = clean(conj);
+      if (conjClean.length < 2 || conjClean === "—" || seen.has(conjClean)) continue;
+      seen.add(conjClean);
+      currentWords.push({ word: conjClean, clue: `${verb.inf}, ${pron}, ${t}` });
+    }
+  }
+  // Filter to only alphabetic words and length 3-15
+  currentWords = currentWords.filter(w => /^[a-z]+$/.test(w.word) && w.word.length >= 3 && w.word.length <= 15);
+  if (currentWords.length > 12) currentWords = currentWords.slice(0, 12);
+}
+
+function clean(s) {
+  return s.toLowerCase()
+    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u')
+    .replace(/ü/g,'u').replace(/ñ/g,'n').replace(/\s+/g,'').replace(/[^a-z]/g,'');
+}
+
+// =========================================================
+// SCREEN NAV
+// =========================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame(type) {
+  currentGameType = type;
+  buildWordList();
+  if (currentWords.length < 3) { alert("Not enough words generated. Try selecting more options."); return; }
+  if (type === 'wordsearch') buildWordSearch();
+  else buildCrossword();
+}
+
+function backToMenu() {
+  document.getElementById('win-modal').classList.remove('show');
+  showScreen('menu-screen');
+}
+function replayGame() {
+  document.getElementById('win-modal').classList.remove('show');
+  startGame(currentGameType);
+}
+
+// =========================================================
+// WORD SEARCH
+// =========================================================
+const WS_SIZE = 14;
+let wsGrid = [], wsSelecting = false, wsStartCell = null, wsFoundWords = new Set();
+let wsPlacedWords = []; // {word, cells: [{r,c}]}
+
+function buildWordSearch() {
+  showScreen('ws-screen');
+  wsGrid = Array.from({length:WS_SIZE}, () => Array(WS_SIZE).fill(''));
+  wsFoundWords = new Set();
+  wsPlacedWords = [];
+
+  const placed = [];
+  const dirs = [[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
+
+  for (const wObj of currentWords) {
+    const word = wObj.word.toUpperCase();
+    let ok = false;
+    for (let attempt = 0; attempt < 200 && !ok; attempt++) {
+      const dir = dirs[Math.floor(Math.random()*dirs.length)];
+      const r = Math.floor(Math.random()*WS_SIZE);
+      const c = Math.floor(Math.random()*WS_SIZE);
+      const cells = [];
+      let valid = true;
+      for (let i = 0; i < word.length; i++) {
+        const nr = r + dir[0]*i, nc = c + dir[1]*i;
+        if (nr<0||nr>=WS_SIZE||nc<0||nc>=WS_SIZE) { valid=false; break; }
+        if (wsGrid[nr][nc] && wsGrid[nr][nc] !== word[i]) { valid=false; break; }
+        cells.push({r:nr,c:nc});
+      }
+      if (valid) {
+        cells.forEach((cell,i) => wsGrid[cell.r][cell.c] = word[i]);
+        wsPlacedWords.push({word, cells});
+        ok = true;
+      }
+    }
+  }
+
+  // Fill remaining
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let r=0;r<WS_SIZE;r++) for (let c=0;c<WS_SIZE;c++) {
+    if (!wsGrid[r][c]) wsGrid[r][c] = letters[Math.floor(Math.random()*26)];
+  }
+
+  renderWSGrid();
+  renderWSWordList();
+  document.getElementById('ws-found').textContent = '0';
+  document.getElementById('ws-total').textContent = wsPlacedWords.length;
+}
+
+function renderWSGrid() {
+  const grid = document.getElementById('ws-grid');
+  grid.style.gridTemplateColumns = `repeat(${WS_SIZE}, 36px)`;
+  grid.innerHTML = '';
+  for (let r=0;r<WS_SIZE;r++) for (let c=0;c<WS_SIZE;c++) {
+    const cell = document.createElement('div');
+    cell.className = 'ws-cell';
+    cell.textContent = wsGrid[r][c];
+    cell.dataset.r = r; cell.dataset.c = c;
+    cell.addEventListener('mousedown', wsMouseDown);
+    cell.addEventListener('mouseenter', wsMouseEnter);
+    cell.addEventListener('mouseup', wsMouseUp);
+    cell.addEventListener('touchstart', wsTouchStart, {passive:true});
+    cell.addEventListener('touchmove', wsTouchMove, {passive:true});
+    cell.addEventListener('touchend', wsTouchEnd);
+    grid.appendChild(cell);
+  }
+}
+
+function getWSCell(r,c) { return document.querySelector(`.ws-cell[data-r="${r}"][data-c="${c}"]`); }
+
+let wsCurrentSelection = [];
+function wsMouseDown(e) {
+  wsSelecting = true;
+  wsStartCell = {r:+e.target.dataset.r, c:+e.target.dataset.c};
+  wsCurrentSelection = [wsStartCell];
+  highlightSelection([wsStartCell]);
+}
+function wsMouseEnter(e) {
+  if (!wsSelecting) return;
+  const end = {r:+e.target.dataset.r, c:+e.target.dataset.c};
+  wsCurrentSelection = getCellsBetween(wsStartCell, end);
+  highlightSelection(wsCurrentSelection);
+}
+function wsMouseUp() {
+  wsSelecting = false;
+  checkWSSelection(wsCurrentSelection);
+  clearHighlight();
+}
+// Touch
+let wsTouchIdentifier = null;
+function wsTouchStart(e) {
+  const t = e.touches[0];
+  wsTouchIdentifier = t.identifier;
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  if (el && el.classList.contains('ws-cell')) {
+    wsSelecting = true;
+    wsStartCell = {r:+el.dataset.r, c:+el.dataset.c};
+    wsCurrentSelection = [wsStartCell];
+    highlightSelection([wsStartCell]);
+  }
+}
+function wsTouchMove(e) {
+  if (!wsSelecting) return;
+  const touch = [...e.touches].find(t => t.identifier === wsTouchIdentifier);
+  if (!touch) return;
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (el && el.classList.contains('ws-cell')) {
+    const end = {r:+el.dataset.r, c:+el.dataset.c};
+    wsCurrentSelection = getCellsBetween(wsStartCell, end);
+    highlightSelection(wsCurrentSelection);
+  }
+}
+function wsTouchEnd() { wsMouseUp(); }
+
+function getCellsBetween(start, end) {
+  const dr = end.r - start.r, dc = end.c - start.c;
+  const len = Math.max(Math.abs(dr), Math.abs(dc));
+  if (len === 0) return [start];
+  // Must be straight line or diagonal
+  const dirs = [[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
+  for (const [ddr,ddc] of dirs) {
+    if (dr === ddr*len && dc === ddc*len) {
+      const cells = [];
+      for (let i=0;i<=len;i++) cells.push({r:start.r+ddr*i, c:start.c+ddc*i});
+      return cells;
+    }
+  }
+  return [start];
+}
+
+function highlightSelection(cells) {
+  document.querySelectorAll('.ws-cell.selecting').forEach(c => c.classList.remove('selecting'));
+  cells.forEach(({r,c}) => {
+    const el = getWSCell(r,c);
+    if (el && !el.classList.contains('found')) el.classList.add('selecting');
+  });
+}
+
+function clearHighlight() {
+  document.querySelectorAll('.ws-cell.selecting').forEach(c => c.classList.remove('selecting'));
+}
+
+function checkWSSelection(cells) {
+  const word = cells.map(({r,c}) => wsGrid[r][c]).join('');
+  const wordRev = word.split('').reverse().join('');
+  for (const pw of wsPlacedWords) {
+    if (wsFoundWords.has(pw.word)) continue;
+    if (pw.word === word || pw.word === wordRev) {
+      wsFoundWords.add(pw.word);
+      pw.cells.forEach(({r,c}) => {
+        const el = getWSCell(r,c);
+        if (el) { el.classList.remove('selecting'); el.classList.add('found'); }
+      });
+      // Mark word list
+      document.querySelector(`[data-ws-word="${pw.word}"]`)?.classList.add('found-word');
+      document.getElementById('ws-found').textContent = wsFoundWords.size;
+      if (wsFoundWords.size === wsPlacedWords.length) setTimeout(showWin, 400);
+      return;
+    }
+  }
+}
+
+function renderWSWordList() {
+  const ul = document.getElementById('ws-word-list');
+  ul.innerHTML = '';
+  wsPlacedWords.forEach(pw => {
+    const wObj = currentWords.find(w => w.word.toUpperCase() === pw.word);
+    const li = document.createElement('li');
+    li.dataset.wsWord = pw.word;
+    li.innerHTML = `<strong>${wObj?.clue || pw.word}</strong><span class="clue">${selectedMode === 'vocab' ? 'Find the Spanish word' : ''}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+// =========================================================
+// CROSSWORD
+// =========================================================
+let cwWords = []; // {word, clue, row, col, dir, num}
+let cwGridData = [];
+let cwSize = 0;
+let cwActiveWord = null;
+let cwSolvedSet = new Set();
+
+function buildCrossword() {
+  showScreen('cw-screen');
+  cwSolvedSet = new Set();
+  const words = currentWords.map(w => ({...w, word: w.word.toUpperCase()}));
+  const placed = placeCrossword(words);
+  if (!placed || placed.length < 2) {
+    // Retry with different word set
+    buildWordList();
+    buildCrossword();
+    return;
+  }
+  cwWords = placed;
+  renderCWGrid();
+  renderCWClues();
+  document.getElementById('cw-solved').textContent = '0';
+  document.getElementById('cw-total').textContent = cwWords.length;
+}
+
+function placeCrossword(words) {
+  // Simple placement: place first word horizontally, then try to intersect others
+  const MAX = 20;
+  let grid = Array.from({length:MAX}, () => Array(MAX).fill(null));
+  const placed = [];
+  const offset = 5; // start position offset
+
+  // Place first word horizontally in center
+  const first = words[0];
+  const fc = offset;
+  const fr = offset;
+  for (let i=0; i<first.word.length; i++) grid[fr][fc+i] = first.word[i];
+  placed.push({...first, row:fr, col:fc, dir:'across'});
+
+  const shuffled = shuffle(words.slice(1));
+  for (const wObj of shuffled) {
+    if (placed.length >= 12) break;
+    let bestPlacement = null;
+    for (const pl of placed) {
+      for (let wi=0; wi<wObj.word.length; wi++) {
+        const ch = wObj.word[wi];
+        for (let pi=0; pi<pl.word.length; pi++) {
+          if (pl.word[pi] !== ch) continue;
+          let r, c, dir;
+          if (pl.dir === 'across') {
+            // New word goes down
+            r = pl.row - wi;
+            c = pl.col + pi;
+            dir = 'down';
+          } else {
+            r = pl.row + pi;
+            c = pl.col - wi;
+            dir = 'across';
+          }
+          if (canPlace(grid, wObj.word, r, c, dir, MAX)) {
+            bestPlacement = {r, c, dir};
+            break;
+          }
+        }
+        if (bestPlacement) break;
+      }
+      if (bestPlacement) break;
+    }
+    if (bestPlacement) {
+      const {r, c, dir} = bestPlacement;
+      placeWord(grid, wObj.word, r, c, dir);
+      placed.push({...wObj, row:r, col:c, dir});
+    }
+  }
+
+  if (placed.length < 2) return null;
+
+  // Trim grid
+  let minR=MAX,maxR=0,minC=MAX,maxC=0;
+  for (let r=0;r<MAX;r++) for (let c=0;c<MAX;c++) if (grid[r][c]) {
+    minR=Math.min(minR,r); maxR=Math.max(maxR,r);
+    minC=Math.min(minC,c); maxC=Math.max(maxC,c);
+  }
+  cwSize = Math.max(maxR-minR+1, maxC-minC+1) + 2;
+  const padding = 1;
+  cwGridData = Array.from({length:cwSize+2}, () => Array(cwSize+2).fill(null));
+  for (let r=minR;r<=maxR;r++) for (let c=minC;c<=maxC;c++) {
+    cwGridData[r-minR+padding][c-minC+padding] = grid[r][c];
+  }
+  cwSize = cwSize + 2;
+
+  // Adjust word positions
+  placed.forEach(w => {
+    w.row = w.row - minR + padding;
+    w.col = w.col - minC + padding;
+  });
+
+  // Assign numbers
+  let num = 1;
+  const numbered = [];
+  for (let r=0;r<cwSize;r++) for (let c=0;c<cwSize;c++) {
+    if (!cwGridData[r][c]) continue;
+    const startsAcross = cwGridData[r][c] && (c===0||!cwGridData[r][c-1]) && cwGridData[r][c+1];
+    const startsDown = cwGridData[r][c] && (r===0||!cwGridData[r-1][c]) && cwGridData[r+1]?.[c];
+    if (startsAcross || startsDown) numbered.push({r,c,num:num++,startsAcross,startsDown});
+  }
+  placed.forEach(w => {
+    const nEntry = numbered.find(n => n.r===w.row && n.c===w.col);
+    w.num = nEntry ? nEntry.num : 0;
+  });
+
+  return placed;
+}
+
+function canPlace(grid, word, r, c, dir, MAX) {
+  for (let i=0; i<word.length; i++) {
+    const nr = dir==='down' ? r+i : r;
+    const nc = dir==='across' ? c+i : c;
+    if (nr<0||nr>=MAX||nc<0||nc>=MAX) return false;
+    if (grid[nr][nc] && grid[nr][nc] !== word[i]) return false;
+    // Check adjacency (don't allow parallel words)
+    if (!grid[nr][nc]) {
+      if (dir==='across') {
+        if (grid[nr-1]?.[nc] || grid[nr+1]?.[nc]) return false;
+      } else {
+        if (grid[nr]?.[nc-1] || grid[nr]?.[nc+1]) return false;
+      }
+    }
+  }
+  // Check before/after
+  if (dir==='across') {
+    if (grid[r][c-1] || grid[r][c+word.length]) return false;
+  } else {
+    if (grid[r-1]?.[c] || grid[r+word.length]?.[c]) return false;
+  }
+  return true;
+}
+
+function placeWord(grid, word, r, c, dir) {
+  for (let i=0; i<word.length; i++) {
+    const nr = dir==='down' ? r+i : r;
+    const nc = dir==='across' ? c+i : c;
+    grid[nr][nc] = word[i];
+  }
+}
+
+function renderCWGrid() {
+  const grid = document.getElementById('cw-grid');
+  grid.style.gridTemplateColumns = `repeat(${cwSize}, 38px)`;
+  grid.style.gridTemplateRows = `repeat(${cwSize}, 38px)`;
+  grid.innerHTML = '';
+
+  // Build number map
+  const numMap = {};
+  cwWords.forEach(w => { if (w.num) numMap[`${w.row},${w.col}`] = w.num; });
+
+  for (let r=0;r<cwSize;r++) for (let c=0;c<cwSize;c++) {
+    const cell = document.createElement('div');
+    const letter = cwGridData[r][c];
+    if (!letter) {
+      cell.className = 'cw-cell black';
+    } else {
+      cell.className = 'cw-cell';
+      cell.dataset.r = r; cell.dataset.c = c;
+      const inp = document.createElement('input');
+      inp.maxLength = 1;
+      inp.dataset.r = r; inp.dataset.c = c;
+      inp.addEventListener('input', cwInput);
+      inp.addEventListener('focus', () => cwFocus(r, c));
+      inp.addEventListener('keydown', cwKeydown);
+      cell.appendChild(inp);
+      if (numMap[`${r},${c}`]) {
+        const num = document.createElement('span');
+        num.className = 'cell-num';
+        num.textContent = numMap[`${r},${c}`];
+        cell.appendChild(num);
+      }
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function getCWCell(r,c) { return document.querySelector(`.cw-cell[data-r="${r}"][data-c="${c}"]`); }
+function getCWInput(r,c) { return document.querySelector(`.cw-cell[data-r="${r}"][data-c="${c}"] input`); }
+
+function cwFocus(r, c) {
+  // Determine which word(s) this cell belongs to; toggle direction
+  const across = cwWords.find(w => w.dir==='across' && w.row===r && c>=w.col && c<w.col+w.word.length);
+  const down = cwWords.find(w => w.dir==='down' && w.col===c && r>=w.row && r<w.row+w.word.length);
+  if (!cwActiveWord) cwActiveWord = across || down;
+  else if (cwActiveWord === across && down) cwActiveWord = down;
+  else if (cwActiveWord === down && across) cwActiveWord = across;
+  else cwActiveWord = across || down;
+  highlightCWWord();
+}
+
+function highlightCWWord() {
+  document.querySelectorAll('.cw-cell').forEach(c => c.classList.remove('active','active-word'));
+  if (!cwActiveWord) return;
+  const w = cwActiveWord;
+  for (let i=0; i<w.word.length; i++) {
+    const r = w.dir==='down' ? w.row+i : w.row;
+    const c = w.dir==='across' ? w.col+i : w.col;
+    const cell = getCWCell(r,c);
+    if (cell) cell.classList.add('active-word');
+  }
+  // Also highlight clue
+  document.querySelectorAll('.clue-item').forEach(ci => ci.classList.remove('active-clue'));
+  document.querySelector(`.clue-item[data-wnum="${w.num}"][data-wdir="${w.dir}"]`)?.classList.add('active-clue');
+}
+
+function cwInput(e) {
+  const inp = e.target;
+  const val = inp.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(-1);
+  inp.value = val;
+  if (val) moveToNextCW(+inp.dataset.r, +inp.dataset.c);
+  checkCWWord();
+}
+
+function cwKeydown(e) {
+  const inp = e.target;
+  const r = +inp.dataset.r, c = +inp.dataset.c;
+  if (e.key === 'Backspace' && !inp.value) {
+    moveToPrevCW(r, c);
+  }
+  if (e.key === 'ArrowRight') { e.preventDefault(); getCWInput(r,c+1)?.focus(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); getCWInput(r,c-1)?.focus(); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); getCWInput(r+1,c)?.focus(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); getCWInput(r-1,c)?.focus(); }
+}
+
+function moveToNextCW(r, c) {
+  if (!cwActiveWord) return;
+  const w = cwActiveWord;
+  const nextIdx = w.dir==='across' ? c+1 : r+1;
+  const limit = w.dir==='across' ? w.col+w.word.length : w.row+w.word.length;
+  if (nextIdx < limit) {
+    const nr = w.dir==='down' ? nextIdx : r;
+    const nc = w.dir==='across' ? nextIdx : c;
+    getCWInput(nr,nc)?.focus();
+  }
+}
+
+function moveToPrevCW(r,c) {
+  if (!cwActiveWord) return;
+  const w = cwActiveWord;
+  const nr = w.dir==='down' ? r-1 : r;
+  const nc = w.dir==='across' ? c-1 : c;
+  const inp = getCWInput(nr,nc);
+  if (inp) { inp.value=''; inp.focus(); }
+}
+
+function checkCWWord() {
+  for (const w of cwWords) {
+    if (cwSolvedSet.has(w.num+'_'+w.dir)) continue;
+    let allCorrect = true;
+    for (let i=0; i<w.word.length; i++) {
+      const r = w.dir==='down' ? w.row+i : w.row;
+      const c = w.dir==='across' ? w.col+i : w.col;
+      const inp = getCWInput(r,c);
+      if (!inp || inp.value.toUpperCase() !== w.word[i]) { allCorrect=false; break; }
+    }
+    if (allCorrect) {
+      cwSolvedSet.add(w.num+'_'+w.dir);
+      for (let i=0; i<w.word.length; i++) {
+        const r = w.dir==='down' ? w.row+i : w.row;
+        const c = w.dir==='across' ? w.col+i : w.col;
+        getCWCell(r,c)?.classList.add('correct');
+      }
+      document.querySelector(`.clue-item[data-wnum="${w.num}"][data-wdir="${w.dir}"]`)?.classList.add('solved-clue');
+      document.getElementById('cw-solved').textContent = cwSolvedSet.size;
+      if (cwSolvedSet.size === cwWords.length) setTimeout(showWin, 400);
+    }
+  }
+}
+
+function renderCWClues() {
+  const acrossEl = document.getElementById('cw-across');
+  const downEl = document.getElementById('cw-down');
+  acrossEl.innerHTML = ''; downEl.innerHTML = '';
+
+  const across = cwWords.filter(w => w.dir==='across').sort((a,b)=>a.num-b.num);
+  const down = cwWords.filter(w => w.dir==='down').sort((a,b)=>a.num-b.num);
+
+  function makeClueItem(w) {
+    const div = document.createElement('div');
+    div.className = 'clue-item';
+    div.dataset.wnum = w.num; div.dataset.wdir = w.dir;
+    div.innerHTML = `<span class="clue-num">${w.num}.</span><span>${w.clue}</span>`;
+    div.onclick = () => {
+      cwActiveWord = w;
+      highlightCWWord();
+      const inp = getCWInput(w.row, w.col);
+      inp?.focus();
+    };
+    return div;
+  }
+  across.forEach(w => acrossEl.appendChild(makeClueItem(w)));
+  down.forEach(w => downEl.appendChild(makeClueItem(w)));
+}
+
+// =========================================================
+// WIN
+// =========================================================
+function showWin() {
+  const msgs = ["¡Felicitaciones! You found all the words!", "¡Muy bien! Puzzle complete!", "¡Perfecto! You're a Spanish star!"];
+  document.getElementById('win-message').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('win-modal').classList.add('show');
+}
+
+// =========================================================
+// UTILS
+// =========================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+init();
+</script>
+</body>
+</html>
